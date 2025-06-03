@@ -4,10 +4,11 @@ export const Register = () => {
     <div className="signup">
       <form>
         <label htmlFor="chk" aria-hidden="true">Registro</label>
-        <input type="text" name="txt" placeholder="Username" required="" />
-        <input type="email" name="email" placeholder="Email" required="" />
-        <input type="number" name="broj" placeholder="Telefono" required="" />
-        <input type="password" name="pswd" placeholder="Password" required="" />
+        <input type="text" name="txt" placeholder="Nombre Completo" required />
+        <input type="text" name="txt" placeholder="Usuario" required />
+        <input type="email" name="email" placeholder="Correo" required />
+        <input type="number" name="broj" placeholder="Telefono" required />
+        <input type="password" name="pswd" placeholder="Contraseña" required />
         <button>Registrarse</button>
       </form>
     </div>
