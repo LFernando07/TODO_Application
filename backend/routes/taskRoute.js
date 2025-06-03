@@ -8,6 +8,7 @@ export const taskRoute = () => {
   router.post('/', TaskController.createTask);
   router.put('/:id', TaskController.updateTask);
   router.delete('/:id', TaskController.deleteTask);
+  router.put('/complete/:id', TaskController.changeTaskStatus);
 
   return router;
 }

@@ -23,9 +23,11 @@ export class UserController {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.status(200).json(user);
+    // retornar usuario sin la contraseña
+    // retornar usuario sin la contraseña
+    const { password: _, ...userWithoutPassword } = user;
 
-
+    res.status(200).json(userWithoutPassword);
   })
 
   static createUser = handleException(async (req, res) => {
@@ -60,9 +62,9 @@ export class UserController {
     if (existingUser) {
       return res.status(409).json({ error: 'User already exists' });
     }
-
+    const salt = parseInt(process.env.SALT_ROUNDS, 10) || 10;
     // hash password (you can use bcrypt or any other library)
-    const hashedPassword = await bcrypt.hash(password, process.env.SALT_ROUNDS || 10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create new user
     const newUser = await prisma.user.create({
@@ -120,7 +122,7 @@ export class UserController {
       const usernameUser = await prisma.user.findUnique({
         where: { username },
       });
-      if (usernameUser && usernameUser.id !== userId) {
+      if (usernameUser && usernameUser.username === username) {
         return res.status(409).json({ error: 'Username already in use' });
       }
     }
@@ -129,12 +131,15 @@ export class UserController {
       return res.status(400).json({ error: 'Password must be at least 8 characters' });
     }
 
+    // Generate salt for hashing password
+    const salt = parseInt(process.env.SALT_ROUNDS, 10) || 10;
+
     // Update user
     const updatedData = {};
     if (name) updatedData.name = name;
     if (username) updatedData.username = username;
     if (email) updatedData.email = email;
-    if (password) updatedData.password = await bcrypt.hash(password, process.env.SALT_ROUNDS || 10);
+    if (password) updatedData.password = await bcrypt.hash(password, salt);
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },

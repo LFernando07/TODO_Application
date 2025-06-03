@@ -1,7 +1,10 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { handleException } from "../common/handle_request.js"
+import { PrismaClient } from "@prisma/client";
 
+// Crear una instancia de PrismaClient
+const prisma = new PrismaClient();
 // New implementation test
 // TODO: Request 3 times to login -> without banned user temporally 
 const loginAttempts = {}; // -> Generate login attempts object 
@@ -19,7 +22,6 @@ export class AuthController {
     }
 
     // General validations
-
     if (!email || !password) {
       return res.status(400).json({ erorr: 'Email and password are required' });
     }

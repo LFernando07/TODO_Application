@@ -8,26 +8,14 @@ export class TaskController {
 
   static getAllTasksByUser = handleException(async (req, res) => {
     // Validar que userId sea un número
-    if (!req.params.userId || isNaN(parseInt(req.params.userId, 10))) {
+    if (!req.params.id || isNaN(parseInt(req.params.id, 10))) {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
 
     const tasks = await prisma.task.findMany({
       where: {
-        userId: parseInt(req.params.userId, 10), // Asegurarse de que userId sea un número
+        userId: parseInt(req.params.id, 10), // Asegurarse de que userId sea un número
       },
-      category: {
-        // Get not id, password, createAt columns for table 
-        select: {
-          id: true,
-          name: true,
-          username: true,
-          email: true
-        }
-      },
-      omit: {
-        userId: true, // Omitir el campo userId si no es necesario
-      }
     });
 
     res.status(200).json(tasks);
@@ -52,12 +40,21 @@ export class TaskController {
     }
 
     if (description.trim().length < 10) {
-      return res.status(400).json({ error: 'Description must be at least 5 characters' });
+      return res.status(400).json({ error: 'Description must be at least 10 characters' });
     }
 
     // Validar que userId sea un número
     if (isNaN(parseInt(userId, 10))) {
       return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
+    // Check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({ error: 'User not found' });
     }
 
     // Crear una nueva tarea
@@ -81,6 +78,20 @@ export class TaskController {
       return res.status(400).json({ error: 'Invalid task ID' });
     }
 
+    // Validar que la tarea exista
+    const taskExists = await prisma.task.findUnique({
+      where: { id: taskId }
+    });
+
+    if (!taskExists) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    // Validar que al menos uno de los campos a actualizar esté presente
+    if (!title && !description && !userId) {
+      return res.status(400).json({ error: 'At least one field (title, description or userId) is required to update' });
+    }
+
     // Validar tipos de datos si se envían
     if (title && typeof title !== 'string') {
       return res.status(400).json({ error: 'Title must be a string' });
@@ -94,15 +105,6 @@ export class TaskController {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
 
-    // Validar que la tarea exista
-    const taskExists = await prisma.task.findUnique({
-      where: { id: taskId }
-    });
-
-    if (!taskExists) {
-      return res.status(404).json({ error: 'Task not found' });
-    }
-
     // Validar que el userId exista en la base de datos si se envía
     if (userId) {
       const userExists = await prisma.user.findUnique({
@@ -112,11 +114,6 @@ export class TaskController {
       if (!userExists) {
         return res.status(404).json({ error: 'User not found' });
       }
-    }
-
-    // Validar que al menos uno de los campos a actualizar esté presente
-    if (!title && !description && !userId) {
-      return res.status(400).json({ error: 'At least one field (title, description or userId) is required to update' });
     }
 
     // Validar que los campos de titulo y descripcion no estén vacíos y tengan longitud mínima
@@ -133,8 +130,8 @@ export class TaskController {
       if (description.trim() === '') {
         return res.status(400).json({ error: 'Description cannot be empty' });
       }
-      if (description.trim().length < 5) {
-        return res.status(400).json({ error: 'Description must be at least 5 characters' });
+      if (description.trim().length < 10) {
+        return res.status(400).json({ error: 'Description must be at least 10 characters' });
       }
     }
 
@@ -181,7 +178,6 @@ export class TaskController {
   // Metodo para cambiar el estado de una tarea
   static changeTaskStatus = handleException(async (req, res) => {
     const taskId = parseInt(req.params.id, 10);
-    const { status, userId } = req.body;
 
     // Validar que taskId sea un número
     if (isNaN(taskId)) {
@@ -197,22 +193,10 @@ export class TaskController {
       return res.status(404).json({ error: 'Task not found' });
     }
 
-    // Validar que el userId exista en la base de datos si se envía
-    if (userId) {
-      const userExists = await prisma.user.findUnique({
-        where: { id: parseInt(userId, 10) }
-      });
-
-      if (!userExists) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-    }
-
     // Actualizar el estado de la tarea -> Asegurarse de cacmbiar el tipo booleano
     const updatedTask = await prisma.task.update({
       data: {
-        status: !status,
-        userId: parseInt(userId, 10),
+        completed: !taskExists.completed
       },
       where: { id: taskId },
     });
