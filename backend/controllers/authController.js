@@ -75,6 +75,7 @@ export class AuthController {
     res.cookie('access_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax', // o 'Strict', según tus necesidades
       maxAge: 1000 * 60 * 60
     });
 
@@ -96,15 +97,9 @@ export class AuthController {
   })
 
   static profileUser = handleException(async (req, res) => {
-    const { user } = req.session
+    const user = req.user;
+    if (!user) return res.status(403).json({ error: 'Access not authorized' });
 
-    if (!user) return res.status(403).send('Access not authorized')
     res.json({ user });
-
-    // const user = req.user;
-
-    // if (!user) return res.status(403).send('Access not authorized');
-    // res.json({ user });
-
   })
 }

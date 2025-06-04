@@ -4,32 +4,17 @@ dotenv.config();
 
 export const authMiddleware = ((req, res, next) => {
   const token = req.cookies.access_token;
-  req.session = { user: null };
 
-  if (token) {
-    try {
-      const data = jwt.verify(token, process.env.SECRET_JWT_KEY);
-      req.session.user = data;
-    } catch (error) {
-      res.json({ error: 'Invalid Token' });
-    }
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
   }
-
-  next();
-
-  // const token = req.cookies.access_token;
-
-  // if (!token) {
-  //   return res.status(401).json({ error: 'No token provided' });
-  // }
-
-  // try {
-  //   const data = jwt.verify(token, process.env.SECRET_JWT_KEY);
-  //   req.user = data; // Usuario autenticado disponible en req.user
-  //   next();
-  // } catch (error) {
-  //   return res.status(401).json({ error: 'Invalid Token' });
-  // }
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_JWT_KEY);
+    req.user = decoded; // GUARDAR el usuario aquí
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid Token' });
+  }
 })
 
 

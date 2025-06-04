@@ -1,7 +1,6 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import { corsMiddleware } from "./middlewares/originsCors.js";
-import { authMiddleware } from "./middlewares/authCors.js";
 import { userRoute } from "./routes/userRoute.js";
 import dotenv from 'dotenv';
 import { taskRoute } from "./routes/taskRoute.js";
@@ -15,7 +14,6 @@ const PORT = process.env.PORT || 1234;
 app.set('json spaces', 2);
 app.use(cookieParser())
 app.use(corsMiddleware())
-app.use(authMiddleware)
 
 app.use(express.json())
 app.disable('x-powered-by')
