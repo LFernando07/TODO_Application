@@ -1,0 +1,21 @@
+.task-list-container{
+  padding: 10px 15px;
+  min-height: 400px;
+  background-color: rgb(250, 234, 214);
+}
+
+.message{
+  display: flex;
+  align-items: center;
+  justify-content: center ;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px 0 rgba(31,47,152,0.08);
+  margin: 1rem 1.5rem;
+  padding: 1rem;
+  transition: background 0.2s, box-shadow 0.2s;
+  color: #8a1313;
+  font-weight: bold;
+  font-size: 1.1rem;
+  list-style: none;
+}

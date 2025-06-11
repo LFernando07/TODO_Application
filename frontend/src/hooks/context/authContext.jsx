@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router";
 import { apiService } from "../../service/api";
+import Swal from "sweetalert2";
 
 // Crear contexto
 const AuthContext = createContext();
@@ -19,9 +19,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await axios.get("http://localhost:1234/api/auth/protected", {
-          withCredentials: true
-        });
+        const res = await apiService.protected();
+        // Si la petición es exitosa, significa que el usuario está autenticado
         setUser(res.data.user); // ✅ Aquí se hidrata el usuario
       } catch {
         setUser(null);
@@ -34,13 +33,50 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
+  // Funcion para modificar el usuario agregado al contexto
+  const updateUser = async (id, data) => {
+    // Aquí puedes hacer una petición a la API para guardar los cambios
+    try {
+      const res = await apiService.updateUser(id, data);
+
+      setUser(res.data);
+      Swal.fire("Éxito", "Usuario actualizado correctamente", "success");
+    } catch (error) {
+      console.log(`Error al modificar perfil ${error}`)
+      Swal.fire("Error", "Hubo un error al actualizar el perfil", "error");
+    }
+  }
+
   // Función de login
   const login = async (data) => {
-    setLoading(true);
-    const res = await apiService.login(data);
-    setUser(res.data.user); // ✅ Guardar el usuario después del login
-    setLoading(false);
-    navigate("/profile");
+    let res;
+    try {
+
+      res = await apiService.login(data);
+      setUser(res.data.user); // ✅ Guardar el usuario después del login
+      navigate("/dashboard");
+    } catch (error) {
+      // Manejo de error al iniciar sesión
+      if (error.response?.status === 429) {
+        Swal.fire({
+          title: "Demasiados intentos",
+          text: "Por favor, espera unos minutos e intenta nuevamente.",
+          icon: "warning"
+        });
+      } else if (error.response?.data?.error) {
+        Swal.fire({
+          title: "Error al iniciar sesión",
+          text: "credenciales incorrectas, intentelo otra vez",
+          icon: "error"
+        });
+      } else {
+        Swal.fire({
+          title: "Error al iniciar sesión",
+          text: "Ha ocurrido un error inesperado.",
+          icon: "error"
+        });
+      }
+    }
   };
 
   // Función de logout
@@ -53,7 +89,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, updateUser, login, logout, loading }}>
       {loading ? <div>Cargando...</div> : children}
     </AuthContext.Provider>
   );

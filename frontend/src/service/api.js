@@ -21,6 +21,7 @@ export const apiService = {
   updateTask: (id, data) => api.put(`/task/${id}`, data),
   deleteTask: (id) => api.delete(`/task/${id}`),
   changeTaskStatus: (id) => api.put(`/task/complete/${id}`),
+  getfilteredTasks: (params) => api.get('/task/tasks', { params }),
 
   // autentication
   login: (data) => api.post('/auth/login', data),

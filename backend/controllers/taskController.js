@@ -16,6 +16,9 @@ export class TaskController {
       where: {
         userId: parseInt(req.params.id, 10), // Asegurarse de que userId sea un número
       },
+      orderBy: {
+        id: 'desc',
+      }
     });
 
     res.status(200).json(tasks);
@@ -204,4 +207,31 @@ export class TaskController {
     res.status(200).json(updatedTask);
   })
 
+  static getfilteredTasks = async (req, res) => {
+    console.log(req)
+    const { userId } = req.user.id
+    const { search = '', completed } = req.query
+
+    try {
+      const whereClause = {
+        userId,
+        title: {
+          contains: search,
+          mode: 'insensitive',
+        },
+        ...(completed !== undefined && completed !== ''
+          ? { completed: completed === 'true' }
+          : {}),
+      }
+
+      const tasks = await prisma.task.findMany({
+        where: whereClause,
+        orderBy: { createdAt: 'desc' },
+      })
+
+      res.json(tasks)
+    } catch (err) {
+      res.status(500).json({ error: 'Error al obtener tareas' })
+    }
+  }
 }

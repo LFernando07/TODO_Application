@@ -2,8 +2,11 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { AuthPage } from "./pages/auth/AuthPage";
 import { useAuth, AuthProvider } from "./hooks/context/authContext";
+import { TaskProvider } from "./hooks/context/taskContext";
 import { ProfilePage } from "./pages/user/ProfilePage";
 import { Dashboard } from "./pages/Dashboard";
+import { NotFound } from "./pages/NotFound";
+
 
 export default function App() {
   // Logica para rutas privadas y publicas
@@ -13,13 +16,13 @@ export default function App() {
   }
 
   return (
-    //Envolvemos el contexto de usuario en toda la aplicación
-
     <BrowserRouter>
+      {/* //Envolvemos el contexto de usuario en toda la aplicación */}
       <AuthProvider>
         <Routes>
-          {/* Pagina publica para autenticarse */}
+          {/* Pagina publica sin autenticarse */}
           <Route path="/" element={<AuthPage />} />
+          <Route path="*" element={<NotFound />} />
 
           {/* Rutas privadas que requieren autenticación */}
           <Route path="/profile" element={
@@ -31,7 +34,9 @@ export default function App() {
 
           <Route path="/dashboard" element={
             <PrivateRoute>
-              <Dashboard />
+              <TaskProvider>
+                <Dashboard />
+              </TaskProvider>
             </PrivateRoute>
           }
           />

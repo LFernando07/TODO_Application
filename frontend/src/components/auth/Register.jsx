@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useAuth } from '../../hooks/context/authContext';
 import { apiService } from '../../service/api';
+import Swal from 'sweetalert2'
 
 
 export const Register = () => {
@@ -12,7 +12,6 @@ export const Register = () => {
     password: ''
   });
 
-  const { login } = useAuth();
 
   // Funcion para el llenado del estado del formulario
   const handleChange = (e) => {
@@ -28,10 +27,18 @@ export const Register = () => {
     try {
       await apiService.createUser(formData)
 
-      // loguear al usuario inmediatamente después de crear la cuenta
-      await login({
-        email: formData.email,
-        password: formData.password
+      Swal.fire({
+        title: "Cuenta creada exitosamente!",
+        text: "Inicia Sesion!",
+        icon: "success"
+      });
+
+      //Limpiamos el formulario
+      setFormData({
+        name: '',
+        username: '',
+        email: '',
+        password: ''
       });
 
     } catch (error) {
@@ -44,12 +51,12 @@ export const Register = () => {
   return (
     <div className="signup">
       <form onSubmit={handleRegister}>
-        <label htmlFor="chk" aria-hidden="true">Registro</label>
-        <input type="text" name="name" placeholder="Nombre Completo" required onChange={handleChange} />
-        <input type="text" name="username" placeholder="Usuario" required onChange={handleChange} />
-        <input type="email" name="email" placeholder="Correo" required onChange={handleChange} />
-        <input type="password" name="password" placeholder="Contraseña" required onChange={handleChange} />
-        <button type='submit'>Registrarse</button>
+        <label className="label-txt" htmlFor="chk" aria-hidden="true">Registro</label>
+        <input className="entrada" type="text" name="name" placeholder="Nombre Completo" required onChange={handleChange} />
+        <input className="entrada" type="text" name="username" placeholder="Usuario" required onChange={handleChange} />
+        <input className="entrada" type="email" name="email" placeholder="Correo" required onChange={handleChange} />
+        <input className="entrada" type="password" name="password" placeholder="Contraseña" required onChange={handleChange} />
+        <button type='submit' className="btn-action">Registrarse</button>
       </form>
     </div>
 

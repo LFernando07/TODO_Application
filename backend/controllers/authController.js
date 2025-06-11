@@ -23,7 +23,7 @@ export class AuthController {
 
     // General validations
     if (!email || !password) {
-      return res.status(400).json({ erorr: 'Email and password are required' });
+      return res.status(400).json({ error: 'Email and password are required' });
     }
 
     if (typeof email !== 'string' || typeof password !== 'string') {
@@ -50,6 +50,7 @@ export class AuthController {
       return res.status(404).json({ error: 'User not found' });
     }
 
+
     // Si el usuario existe verificar la contraseña
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -67,7 +68,7 @@ export class AuthController {
 
     // Si la contraseña es válida, generar un token JWT
     const token = jwt.sign(
-      { id: user.id, username: user.username, email: user.email },
+      { id: user.id, name: user.name, username: user.username, email: user.email },
       process.env.SECRET_JWT_KEY,
       { expiresIn: '1h' }
     );

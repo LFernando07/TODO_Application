@@ -99,13 +99,13 @@ export class UserController {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Validaciones solo si se envían los campos
-    if (email) {
+    // Validar email si se envía y cambió
+    if (email && email !== existingUser.email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         return res.status(400).json({ error: 'Invalid email format' });
       }
-      // Validar unicidad de email
+
       const emailUser = await prisma.user.findUnique({
         where: { email },
       });
@@ -114,15 +114,16 @@ export class UserController {
       }
     }
 
-    if (username) {
+    // Validar username si se envía y cambió
+    if (username && username !== existingUser.username) {
       if (typeof username !== 'string') {
         return res.status(400).json({ error: 'Invalid username type' });
       }
-      // Validar unicidad de username
+
       const usernameUser = await prisma.user.findUnique({
         where: { username },
       });
-      if (usernameUser && usernameUser.username === username) {
+      if (usernameUser && usernameUser.id !== userId) {
         return res.status(409).json({ error: 'Username already in use' });
       }
     }
@@ -131,25 +132,24 @@ export class UserController {
       return res.status(400).json({ error: 'Password must be at least 8 characters' });
     }
 
-    // Generate salt for hashing password
-    const salt = parseInt(process.env.SALT_ROUNDS, 10) || 10;
-
     // Update user
     const updatedData = {};
     if (name) updatedData.name = name;
     if (username) updatedData.username = username;
     if (email) updatedData.email = email;
-    if (password) updatedData.password = await bcrypt.hash(password, salt);
+    if (password) {
+      const salt = parseInt(process.env.SALT_ROUNDS, 10) || 10;
+      updatedData.password = await bcrypt.hash(password, salt);
+    }
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: updatedData,
     });
 
-    // retornar usuario sin la contraseña
     const { password: _, ...userWithoutPassword } = updatedUser;
-
     res.status(200).json(userWithoutPassword);
+
   })
 
   static deleteUser = handleException(async (req, res) => {

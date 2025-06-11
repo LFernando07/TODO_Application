@@ -1,13 +1,15 @@
-body{
-  all: unset;
+.auth-box{
 	margin: 0;
 	padding: 0;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 	min-height: 100vh;
 	font-family: 'Jost', sans-serif;
 	background: linear-gradient(to bottom, #1f2f98, #1cb5e0, #00c9a7);
+  /* background: linear-gradient(45deg, #EFE4D2) ; */
   animation: gradientAnimation 15s ease infinite;;
   background-size: cover;
 }
@@ -18,10 +20,11 @@ body{
   100% { background-position: 0% 50%; }
 }
 
-.container{
+.auth-container{
 	width: 400px;
 	height: 550px;
-  background: linear-gradient(to top, #1f2f98, #3d3879, #7965C1);
+  /* background: linear-gradient(to top, #1f2f98, #3d3879, #7965C1); */
+  background: #131D4F;
 	overflow: hidden;
 	border-radius: 10px;
 	box-shadow: 5px 20px 50px #000;
@@ -35,8 +38,8 @@ body{
 	width:100%;
 	height: 100%;
 }
-label{
-	color: #fff;
+.label-txt{
+	color: #EFE4D2;
 	font-size: 2.3em;
 	justify-content: center;
 	display: flex;
@@ -47,7 +50,7 @@ label{
 	cursor: pointer;
 	transition: .5s ease-in-out;
 }
-input{
+.entrada{
 	width: 60%;
 	height: 10px;
 	background: #e0dede;
@@ -60,25 +63,25 @@ input{
 	outline: none;
 	border-radius: 5px;
 }
-button{
+.btn-action{
 	width: 60%;
 	height: 40px;
 	margin: 10px auto;
 	justify-content: center;
 	display: block;
-	color: #fff;
-	background: #573b8a;
+	color: #e0dede;
+	background: #884328;
 	font-size: 1em;
 	font-weight: bold;
 	margin-top: 30px;
 	outline: none;
-	border: none;
+	border: none; 
 	border-radius: 5px;
 	transition: .2s ease-in;
 	cursor: pointer;
 }
-button:hover{
-	background: #6d44b8;
+.btn-action:hover{
+	background: #642d17;
 }
 .login{
 	height: 460px;
@@ -87,8 +90,8 @@ button:hover{
 	transform: translateY(-180px);
 	transition: .8s ease-in-out;
 }
-.login label{
-	color: #573b8a;
+.login .label-txt{
+	color: #131D4F;
 	transform: scale(.6);
 }
 
